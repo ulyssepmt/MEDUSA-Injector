@@ -118,20 +118,22 @@ DWORD GetModuleBaseAddress(DWORD ProcID, wchar_t* pMod) {
 
 
 typedef NTSTATUS(NTAPI* RtlAdjustPrivilegeDef) (IN ULONG Privilege, IN BOOLEAN Enable, IN BOOLEAN CurrentThread, OUT PBOOLEAN Enabled);
-	HMODULE hModuleNtDll = GetModuleHandleW(L"ntdll.dll");
-
+BOOL EnablePrivilege() { 
 	BOOLEAN bEnabled;
+	HMODULE hModuleNtDll = GetModuleHandleW(L"ntdll.dll");
 	RtlAdjustPrivilegeDef RtlAdjustPrivilege = (RtlAdjustPrivilegeDef)GetProcAddress(hModuleNtDll, "RtlAdjustPrivilege");
-	RtlAdjustPrivilege(0x00000014, TRUE, FALSE, &bEnabled);
 
-	if (!NT_SUCCESS(RtlAdjustPrivilege(0x00000014, TRUE, FALSE, &bEnabled))) {
-		return FALSE;
+	NTSTATUS status = RtlAdjustPrivilege(0x00000014, TRUE, FALSE, &bEnabled);
+
+	if (status) {
+		return TRUE;
 	}
 	else if (!bEnabled) {
 		return FALSE;
 	}
 	else {
-		return TRUE; 
+		return TRUE;
 	}
 }
+
 
