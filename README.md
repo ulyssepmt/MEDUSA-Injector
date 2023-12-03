@@ -63,7 +63,4 @@ Je n'ai malheureusement pas assez de connaissances des entêtes PE d'une DLL et 
 
 
 Vidéo démo : 
-
-
-
-[Vidéo démo] 
+https://youtu.be/8icPzcMbqTs
