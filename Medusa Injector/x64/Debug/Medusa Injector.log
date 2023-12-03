@@ -1,0 +1,5 @@
+﻿  features.c
+C:\Users\ulyss\source\repos\Medusa Injector\Medusa Injector\features.c(9,17): warning C4098: 'ShowProcs' : fonction 'void' retournant une valeur
+C:\Users\ulyss\source\repos\Medusa Injector\Medusa Injector\features.c(40,26): warning C4028: paramètre formel 1 différent de la déclaration
+C:\Users\ulyss\source\repos\Medusa Injector\Medusa Injector\features.c(40,41): warning C4028: paramètre formel 2 différent de la déclaration
+  Medusa Injector.vcxproj -> C:\Users\ulyss\source\repos\Medusa Injector\x64\Debug\Medusa Injector.exe
