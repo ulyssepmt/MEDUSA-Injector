@@ -60,11 +60,11 @@ HANDLE GetHijackThread(DWORD pID) {
 }
 
 DWORD GetpIDFrompName(LPCTSTR pName) { 
-	// récupére l'ID du processus par son nom. Le but de cette partie du code est de retourner un message d'erreur si le nom du processus entré n'est pas en cours d'éxécution {
+	// rÃ©cupÃ©re l'ID du processus par son nom. Le but de cette partie du code est de retourner un message d'erreur si le nom du processus entrÃ© n'est pas en cours d'Ã©xÃ©cution {
 
 	PROCESSENTRY32 pt;
-	HANDLE hsnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); // récupère instantanément un processus ciblé, les modules & threads qui lui sont associés
-	pt.dwSize = sizeof(PROCESSENTRY32); // renvoie la quantité de mémoire occupée par pt
+	HANDLE hsnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); // rÃ©cupÃ¨re instantanÃ©ment un processus ciblÃ©, les modules & threads qui lui sont associÃ©s
+	pt.dwSize = sizeof(PROCESSENTRY32); // renvoie la quantitÃ© de mÃ©moire occupÃ©e par pt
 
 	if (Process32First(hsnap, &pt))
 	{
@@ -118,21 +118,20 @@ DWORD GetModuleBaseAddress(DWORD ProcID, wchar_t* pMod) {
 
 
 typedef NTSTATUS(NTAPI* RtlAdjustPrivilegeDef) (IN ULONG Privilege, IN BOOLEAN Enable, IN BOOLEAN CurrentThread, OUT PBOOLEAN Enabled);
-BOOL EnablePrivilege() { //Auteur : https://github.com/AzureGreen
-	BOOLEAN bEnabled;
 	HMODULE hModuleNtDll = GetModuleHandleW(L"ntdll.dll");
+
+	BOOLEAN bEnabled;
 	RtlAdjustPrivilegeDef RtlAdjustPrivilege = (RtlAdjustPrivilegeDef)GetProcAddress(hModuleNtDll, "RtlAdjustPrivilege");
+	RtlAdjustPrivilege(0x00000014, TRUE, FALSE, &bEnabled);
 
-	NTSTATUS status = RtlAdjustPrivilege(0x00000014, TRUE, FALSE, &bEnabled);
-
-	if (!NT_SUCCESS(status)) {
+	if (!NT_SUCCESS(RtlAdjustPrivilege(0x00000014, TRUE, FALSE, &bEnabled))) {
 		return FALSE;
 	}
 	else if (!bEnabled) {
 		return FALSE;
 	}
 	else {
-		return TRUE;
+		return TRUE; 
 	}
 }
 
