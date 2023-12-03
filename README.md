@@ -1,4 +1,4 @@
-###### MEDUSA Injector
+# MEDUSA Injector
 
 Un injecteur de DLL rapide et efficace pour Windows 10, codé en C. Ce petit projet fait suite à l'ancien injecteur publié en 2021 qui était absolument afreux. 
 
@@ -21,7 +21,7 @@ Un processus peut ouvrir un ou plusieurs threads dans son espace de mémoire vir
 
 Injecter une DLL dans l'espace mémoire d'un programme permet donc d'en modifier son comportement et ses paramètres en modifiant ou utilisant le code d'une fonction. Cela est chose courante dans l'univers du game hacking ou il est possible d'utiliser une dll malveillante permettant par exemple au joueur de voir les textures et le modèles des joueurs ennemis à travers les murs. 
 
-# L'injection de DLL respecte ces étapes :  
+L'injection de DLL respecte ces étapes :  
 
 1) Ouvrir un processus avec les droits requis en connaissant son PID (OpenProcess()) ;  
 2) Créer un buffer et lui allouer de la mémoire dans le processus cible (VirtualAlloc()) ; 
