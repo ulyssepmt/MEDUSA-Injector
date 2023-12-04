@@ -10,10 +10,10 @@ Celui-là propose plusieurs fonctionnalités :
 
 - Possibilité de charger une config et d'injecter la dll dans le processus de la précédente injection. Configuration qui est d'ailleurs enregistrée dans un fichier txt   
   lorsque l'injection réussie. 
-
-- Injection utilisant différent moyens de création de threads.
-
-- Thread Hijacking
+- Visualisation des processus actifs. 
+- Visualisation des modules chargés dans la mémoire d'un processus. 
+- Injection utilisant différent moyens de création de threads (ZwCreateUserThread, RtlCreateUserThread).
+- Thread Hijacking. 
 
 
 # Injection classique :  
@@ -55,7 +55,7 @@ Allocation de mémoire dans le processus cible pour 3 paramètres :
 - le contexte du thread ;
 - le shellcode.
 
-Ces paramètres sont ensuite écrits dans l'espace mémoire du processus (comme pour une injection classique - à l'aide de WriteProcessMemory()). Le contexte du thread peut ainsi être modifié afin de pointer vers l'adresse du shellcode, qui sera exécuté par le thread détourné. Il ne reste plus qu'à relancer le thread avec le nouveau contexte dans son espace mémoire, en renvoyant l'adresse du pointeur d'instruction du contexte d'origine, comme si de rien n'était ! 
+Ces paramètres sont ensuite écrits dans l'espace mémoire du processus (comme pour une injection classique - à l'aide de WriteProcessMemory()). Le contexte du thread peut ainsi être modifié afin de pointer vers l'adresse du shellcode, qui sera exécuté par le thread détourné. Il ne reste plus qu'à relancer le thread avec le nouveau contexte (avec le shellcode) dans son espace mémoire , en renvoyant l'adresse du pointeur d'instruction du contexte d'origine, comme si de rien n'était ! 
 
 ![hijack](https://github.com/ulyssepmt/MEDUSA-Injector/assets/89702597/b8d441b2-9b8f-438c-92fe-2e9c72d09eaa)
 
@@ -68,3 +68,9 @@ Je n'ai malheureusement pas assez de connaissances des entêtes PE d'une DLL et 
 
 Vidéo démo : 
 https://youtu.be/8icPzcMbqTs
+
+
+# Crédits : 
+- Forum www.unknowncheat.me
+- Forum Rohitab
+- Victeezy (icon medusa) : https://www.vecteezy.com/
