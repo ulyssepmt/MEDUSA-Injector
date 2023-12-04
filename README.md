@@ -72,5 +72,5 @@ https://youtu.be/8icPzcMbqTs
 
 # Crédits : 
 - Forum www.unknowncheat.me
-- Forum Rohitab
-- Victeezy (icon medusa) : https://www.vecteezy.com/
+- Forum http://www.rohitab.com/
+- Victeezy (icon medusa FREE LICENSE) : https://www.vecteezy.com/ | Author : https://www.vecteezy.com/members/latiefzubet736081
