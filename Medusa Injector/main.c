@@ -95,9 +95,9 @@ void main() {
 
         if (input == 0) {
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
-            printf("Medusa injector v1.0, coded in C by sk0za. For more informations about usages and injection process, see: https://github.com/ulyssepmt");  
+            printf("Medusa injector v1.0, coded in C by sk0za. \nCredits:\n- Forum www.unknowncheat.me\n- Forum http ://www.rohitab.com/\n- Victeezy(icon medusa FREE LICENSE) : https ://www.vecteezy.com/\nAuthor : https://www.vecteezy.com/members/latiefzubet736081 \n\nFor more informations about usages and injection process, see: https://github.com/ulyssepmt \n");  
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), UICOLOR);
-            printf("\n\n");             //déborde sur l'autre ligne sinon 
+            printf("\n\n");             //dÃ©borde sur l'autre ligne sinon 
         }
         if (input == 1) {
 
@@ -153,7 +153,7 @@ void main() {
             DWORD pID = GetpIDFrompName(proc);
             if (pID == 1 || pID == 0) {
 
-                LogError(L"Process not found! Please enter a valid process name", L"", 0); // L"" pour éviter l'affichage "(null)"
+                LogError(L"Process not found! Please enter a valid process name", L"", 0); // L"" pour Ã©viter l'affichage "(null)"
                 continue;
             }
             else {
