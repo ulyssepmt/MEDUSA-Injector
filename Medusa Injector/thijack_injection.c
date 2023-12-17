@@ -1,22 +1,22 @@
 #include "injection.h"
 
-/*Galère car je pensais pas possible la manipulation d'un thread distant à l'aide de la structure CONTEXT en x64 (rip et non eip).
-Grand merci au forum www.unknowncheats.me pour ça*/
+/*GalÃ¨re car je pensais pas possible la manipulation d'un thread distant Ã  l'aide de la structure CONTEXT en x64 (rip et non eip).
+Grand merci au forum www.unknowncheats.me pour Ã§a*/
 
 HANDLE hProcess = 0;
 
-//Ce shellcode n'a pas été construit par moi ! 
+//Ce shellcode n'a pas Ã©tÃ© construit par moi ! 
 
 unsigned char x64_shellcode[] = {
-	0x48, 0xB9,	0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, // address_ptr_dll_path
-	0x48, 0xB8, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, // address_Loadlibrary
-	0x48, 0x83, 0xEC, 0x40, // shadow registers
-	0x48, 0x83, 0xE4, 0xF7, // align 16 bytes
-	0xFF, 0xD0, // call rax
-	0x48, 0xB9, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, // address_ptr_context
-	0x48, 0xB8, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, // address_RtlRestoreContext
-	0x48, 0x31, 0xd2, // xor rdx, rdx
-	0xFF, 0xD0 // call rax
+	0x48, 0xB9,	0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 
+	0x48, 0xB8, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 
+	0x48, 0x83, 0xEC, 0x40, 
+	0x48, 0x83, 0xE4, 0xF7, 
+	0xFF, 0xD0, 
+	0x48, 0xB9, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 
+	0x48, 0xB8, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC,
+	0x48, 0x31, 0xd2, 
+	0xFF, 0xD0 
 };
 
 int PrepareShellcode(DWORD64 dllPathAddr, DWORD64 cAddr) {
@@ -29,7 +29,7 @@ int PrepareShellcode(DWORD64 dllPathAddr, DWORD64 cAddr) {
 		if (GetModuleBaseNameW(hProcess, hmodules[i], module_name, MAX_PATH) != 0) {
 			if (lstrcmpiW(module_name, L"kernel32.dll") == 0) {
 				/*Recherche de kernel32.dll pour calculer les adresses des fonctions LoadLibraryW et RtlRestoreContext 
-				en soustrayant leur adresse à celle du module ciblé (kernel32) dans l'espace mémoire du pid cible.*/
+				en soustrayant leur adresse Ã  celle du module ciblÃ© (kernel32) dans l'espace mÃ©moire du pid cible.*/
 				DWORD64 loadlibraryaddress = (DWORD64)LoadLibraryW - (DWORD64)GetModuleHandleW(L"kernel32.dll") + (DWORD64)hmodules[i];
 				DWORD64 rtlrestorecontext = (DWORD64)RtlRestoreContext - (DWORD64)GetModuleHandleW(L"kernel32.dll") + (DWORD64)hmodules[i];
 				memcpy(&x64_shellcode[2], &dllPathAddr, sizeof(DWORD64));
@@ -82,7 +82,7 @@ BOOL LoadShellcode(/*PVOID Loadermemory, */wchar_t* pdll, DWORD pID) {
 							if (!GetThreadContext(hHijackThread, &cThread)) {
 
 								LogError(L" - (HIJACK) Failed to get thread context", L"", GetLastError());
-								ResumeThread(hHijackThread); // relance qd mm pour éviter crashs
+								ResumeThread(hHijackThread); // relance qd mm pour Ã©viter crashs
 								return FALSE;
 							}
 							BOOL writePathDAddress = WriteProcessMemory(hProcess, allocDLLPath, pdll, dll_path_size * sizeof(wchar_t), 0);
@@ -121,7 +121,7 @@ BOOL LoadShellcode(/*PVOID Loadermemory, */wchar_t* pdll, DWORD pID) {
 							
 							WaitForSingleObject(hHijackThread, 5000);
 							if ((GetProcessModule(GetModuleFromPath(pdll, bDLL), pID, 0) == FALSE)) {
-								// if(hHihackThread) peut être non null et échouer
+								// if(hHihackThread) peut Ãªtre non null et Ã©chouer
 								return FALSE;
 							}
 							PostThreadMessage(hHijackThread, WM_NULL, 0, 0);
