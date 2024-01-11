@@ -60,92 +60,96 @@ BOOL LoadShellcode(/*PVOID Loadermemory, */wchar_t* pdll, DWORD pID) {
 
 		DWORD64 allocDLLPath = VirtualAllocEx(hProcess, 0, dll_path_size * sizeof(wchar_t), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 		if (allocDLLPath != 0) {
+		    DWORD64 allocDLLContext = VirtualAllocEx(hProcess, 0, sizeof(CONTEXT), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+			
+		if (allocDLLContext != 0) {
+		    DWORD64 allocDLLShellcode = VirtualAllocEx(hProcess, 0, sizeof(x64_shellcode), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+			
+		if (allocDLLShellcode != 0) {
 
-			DWORD64 allocDLLContext = VirtualAllocEx(hProcess, 0, sizeof(CONTEXT), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-			if (allocDLLContext != 0) {
+			if (PrepareShellcode(allocDLLPath, allocDLLContext)) {
+				hHijackThread = GetHijackThread(pID); //GetHijackThread();
 
-				DWORD64 allocDLLShellcode = VirtualAllocEx(hProcess, 0, sizeof(x64_shellcode), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-				if (allocDLLShellcode != 0) {
+				if (hHijackThread == INVALID_HANDLE_VALUE) { return FALSE; }
 
-					if (PrepareShellcode(allocDLLPath, allocDLLContext)) {
-						hHijackThread = GetHijackThread(pID); //GetHijackThread();
+				if (hHijackThread != NULL && hHijackThread != INVALID_HANDLE_VALUE) {
+					
+				if (SuspendThread(hHijackThread) == (DWORD)-1) {
 
-						if (hHijackThread == INVALID_HANDLE_VALUE) { return FALSE; }
+					LogError(L" - (HIJACK) Failed to suspend the thread", L"", GetLastError());
+					return FALSE;
+					}
 
-						if (hHijackThread != NULL && hHijackThread != INVALID_HANDLE_VALUE) {
-							if (SuspendThread(hHijackThread) == (DWORD)-1) {
+				if (!GetThreadContext(hHijackThread, &cThread)) {
 
-								LogError(L" - (HIJACK) Failed to suspend the thread", L"", GetLastError());
-								return FALSE;
-							}
+					LogError(L" - (HIJACK) Failed to get thread context", L"", GetLastError());
+					ResumeThread(hHijackThread); // relance qd mm pour éviter crashs
+					return FALSE;
+					}
+					
+				BOOL writePathDAddress = WriteProcessMemory(hProcess, allocDLLPath, pdll, dll_path_size * sizeof(wchar_t), 0);
+				if (writePathDAddress == NULL) {
+					LogError(L" - (HIJACK) Failed to write memory in process (dll)", L"", GetLastError());
+					return FALSE;
+					}
 
-							if (!GetThreadContext(hHijackThread, &cThread)) {
+				BOOL writeContextAddress = WriteProcessMemory(hProcess, allocDLLContext, &cThread, sizeof(CONTEXT), 0);
+				if (writeContextAddress == NULL) {
+					LogError(L" - (HIJACK) Failed to write memory in process (Thread CONTEXT)", L"", GetLastError());
+					return FALSE;
+					}
 
-								LogError(L" - (HIJACK) Failed to get thread context", L"", GetLastError());
-								ResumeThread(hHijackThread); // relance qd mm pour éviter crashs
-								return FALSE;
-							}
-							BOOL writePathDAddress = WriteProcessMemory(hProcess, allocDLLPath, pdll, dll_path_size * sizeof(wchar_t), 0);
-							if (writePathDAddress == NULL) {
-								LogError(L" - (HIJACK) Failed to write memory in process (dll)", L"", GetLastError());
-								return FALSE;
-							}
+				BOOL writeShellcodeAddress = WriteProcessMemory(hProcess, allocDLLShellcode, x64_shellcode, sizeof(x64_shellcode), 0);
+				if (writeShellcodeAddress == NULL) {
 
-							BOOL writeContextAddress = WriteProcessMemory(hProcess, allocDLLContext, &cThread, sizeof(CONTEXT), 0);
-							if (writeContextAddress == NULL) {
-								LogError(L" - (HIJACK) Failed to write memory in process (Thread CONTEXT)", L"", GetLastError());
-								return FALSE;
-							}
+				LogError(L" - (HIJACK) Failed to write memory in process (Shellcode)", L"", GetLastError());
+				return FALSE;
+					}
+					
+				cThread.Rip = allocDLLShellcode;
 
-							BOOL writeShellcodeAddress = WriteProcessMemory(hProcess, allocDLLShellcode, x64_shellcode, sizeof(x64_shellcode), 0);
-							if (writeShellcodeAddress == NULL) {
+				if (!SetThreadContext(hHijackThread, &cThread)) {
+					LogError(L" - (HIJACK) Failed to set thread context", L"", GetLastError());
+					return FALSE;
+					}
 
-								LogError(L" - (HIJACK) Failed to write memory in process (Shellcode)", L"", GetLastError());
-								return FALSE;
-							}
-							cThread.Rip = allocDLLShellcode;
-
-							if (!SetThreadContext(hHijackThread, &cThread)) {
-								LogError(L" - (HIJACK) Failed to set thread context", L"", GetLastError());
-								return FALSE;
-							}
-
-							if (ResumeThread(hHijackThread) == (DWORD)-1) {
-								LogError(L" - (HIJACK) Failed to resume thread", L"", GetLastError());
-								return FALSE;
-							}
-							if (hHijackThread == NULL) {
-								return FALSE;
-							}
+				if (ResumeThread(hHijackThread) == (DWORD)-1) {
+					LogError(L" - (HIJACK) Failed to resume thread", L"", GetLastError());
+					return FALSE;
+					}
+					
+				if (hHijackThread == NULL) {
+					return FALSE;
+					}
 							//printf("0x%p", hHijackThread); 
 							
-							WaitForSingleObject(hHijackThread, 5000);
-							if ((GetProcessModule(GetModuleFromPath(pdll, bDLL), pID, 0) == FALSE)) {
-								// if(hHihackThread) peut être non null et échouer
-								return FALSE;
-							}
-							PostThreadMessage(hHijackThread, WM_NULL, 0, 0);
-							return TRUE;
+				WaitForSingleObject(hHijackThread, 5000);
+				if ((GetProcessModule(GetModuleFromPath(pdll, bDLL), pID, 0) == FALSE)) {
+					// if(hHihackThread) peut être non null et échouer
+					return FALSE;
+					}
+				PostThreadMessage(hHijackThread, WM_NULL, 0, 0);
+				return TRUE;
 						}
 					}
 				}
 				else {
-					LogError(L" - (HIJACK) Can't allocate memory for shellcode", L"", GetLastError());
+				LogError(L" - (HIJACK) Can't allocate memory for shellcode", L"", GetLastError());
+				return FALSE;
+					}
+				}
+				else {
+					LogError(L" - (HIJACK) Can't allocate memory for Thread CONTEXT", L"", GetLastError());
+					return FALSE;
+					}
+				}
+				else {
+					LogError(L" - (HIJACK) Can't allocate memory for dll", L"", GetLastError());
 					return FALSE;
 				}
-			}
-			else {
-				LogError(L" - (HIJACK) Can't allocate memory for Thread CONTEXT", L"", GetLastError());
+
+			} else {
+				LogError(L" - (HIJACK) Failed to open targeted process", L"", GetLastError());
 				return FALSE;
 			}
 		}
-		else {
-			LogError(L" - (HIJACK) Can't allocate memory for dll", L"", GetLastError());
-			return FALSE;
-		}
-
-	} else {
-		LogError(L" - (HIJACK) Failed to open targeted process", L"", GetLastError());
-		return FALSE;
-	}
-}
