@@ -14,7 +14,7 @@ BOOL LoadDLL(wchar_t* dll, DWORD pID) {
 	HMODULE hNtdll = GetModuleHandleW(L"ntdll"); 
 	RtlCreateUserThreadDef RtlCreateUserThread = (RtlCreateUserThreadDef)GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "RtlCreateUserThread");
 
-	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE,  pID); // droits requis pour la création de threads 
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE,  pID); // droits requis pour la crÃ©ation de threads 
 	
 	if (hProcess == NULL) {
 		LogError(L"Failed to open targeted process", L"", GetLastError()); 
@@ -54,38 +54,38 @@ BOOL LoadDLL(wchar_t* dll, DWORD pID) {
 		HRESULT ntStat = ZwCreateThreadEx(&hThread, THREAD_ALL_ACCESS, 0, hProcess, (LPTHREAD_START_ROUTINE)LoadLib, pLibFileRemote, THREAD_CREATE_FLAGS_HIDE_FROM_DEBUGGER, 0, 0, 0, 0);
 			WaitForSingleObject(hThread, INFINITE); 
 			if ((GetProcessModule(GetModuleFromPath(dll, bDLL), pID, 0) == FALSE) || hThread == NULL) {
-			     wprintf(L"[ERROR %lu] Failed with NtCreateThreadEx %p!\n", GetLastError(), hThread);
-				 //Qqs cas ou la dll peut ne pas être injectée avec un handle hThread diff de 0
+				wprintf(L"[ERROR %lu] Failed with NtCreateThreadEx %p!\n", GetLastError(), hThread);
+				 //Qqs cas ou la dll peut ne pas Ãªtre injectÃ©e avec un handle hThread diff de 0
 
 				HRESULT RTLThread = RtlCreateUserThread(hProcess, NULL, FALSE, 0, NULL, NULL, (PVOID)GetProcAddress(GetModuleHandleW(L"Kernel32"), "LoadLibraryW"), pLibFileRemote, &hThread, NULL);
 				WaitForSingleObject(hThread, INFINITE);
 
-					if ((GetProcessModule(GetModuleFromPath(dll, bDLL), pID, 0) == FALSE) || hThread <= 0) {
-						wprintf(L"[ERROR %lu] Failed with RtlCreateUserThread | hThread = %p!\n", GetLastError(), hThread);
+			if ((GetProcessModule(GetModuleFromPath(dll, bDLL), pID, 0) == FALSE) || hThread <= 0) {
+				wprintf(L"[ERROR %lu] Failed with RtlCreateUserThread | hThread = %p!\n", GetLastError(), hThread);
 
-						HANDLE RemoteThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)LoadLib, pLibFileRemote, 0, NULL);
-							WaitForSingleObject(RemoteThread, INFINITE);
+				HANDLE RemoteThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)LoadLib, pLibFileRemote, 0, NULL);
+				WaitForSingleObject(RemoteThread, INFINITE);
 
-							if ((GetProcessModule(GetModuleFromPath(dll, bDLL), pID, 0) == FALSE) || RemoteThread <= 0) {
-								wprintf(L"[ERROR %lu] Failed with CreateRemoteThread | hThread = %p!\n", GetLastError(), hThread);
-									return FALSE;
-								}
+				if ((GetProcessModule(GetModuleFromPath(dll, bDLL), pID, 0) == FALSE) || RemoteThread <= 0) {
+					wprintf(L"[ERROR %lu] Failed with CreateRemoteThread | hThread = %p!\n", GetLastError(), hThread);
+					return FALSE;
+					}
 								
-								else {
-									LogSuccess(L" - (OK) Injected using CreateRemoteThread() function\n", L"");
-									WaitForSingleObject(RemoteThread, INFINITE);
-									CloseHandle(RemoteThread);
-									VirtualFreeEx(hProcess, pLibFileRemote, 0, MEM_RELEASE);
-									CloseHandle(hProcess);
+				else {
+					LogSuccess(L" - (OK) Injected using CreateRemoteThread() function\n", L"");
+					WaitForSingleObject(RemoteThread, INFINITE);
+					CloseHandle(RemoteThread);
+					VirtualFreeEx(hProcess, pLibFileRemote, 0, MEM_RELEASE);
+					CloseHandle(hProcess);
 								}
 							}
 						
-						else {
-							LogSuccess(L" - (OK) Injected using RtlCreateUserThread() function", L"");
-							WaitForSingleObject(hThread, INFINITE);
-							CloseHandle(hThread);
-							VirtualFreeEx(hProcess, pLibFileRemote, 0, MEM_RELEASE);
-							CloseHandle(hProcess);
+				else {
+					LogSuccess(L" - (OK) Injected using RtlCreateUserThread() function", L"");
+					WaitForSingleObject(hThread, INFINITE);
+					CloseHandle(hThread);
+					VirtualFreeEx(hProcess, pLibFileRemote, 0, MEM_RELEASE);
+					CloseHandle(hProcess);
 						}
 
 					}
