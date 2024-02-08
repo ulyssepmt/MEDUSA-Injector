@@ -4,14 +4,14 @@
 
 BOOL LoadDLL(wchar_t* dll, DWORD pID) {
 
+	HANDLE hThread = NULL;  
+
 	if ((GetProcessModule(GetModuleFromPath(dll, bDLL), pID, 0) == TRUE)) {
 		if (UnloadDLL(dll, pID) == FALSE) {
 			LogError(L"Can't unload DLL", NULL, NULL); 
 		}
 	   
 	}
-	HANDLE hThread = NULL; 
-	HMODULE hNtdll = GetModuleHandleW(L"ntdll"); 
 	RtlCreateUserThreadDef RtlCreateUserThread = (RtlCreateUserThreadDef)GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "RtlCreateUserThread");
 
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE,  pID); // droits requis pour la création de threads 
