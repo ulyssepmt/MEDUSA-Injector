@@ -1,4 +1,0 @@
-﻿  injection.c
-C:\Users\ulyss\Desktop\MEDUSA-Injector-medusa-patch-1\MEDUSA-Injector-medusa-patch-1\Medusa Injector\injection.c(11,38): warning C4047: 'fonction' : les niveaux d'indirection de 'DWORD' et de 'void *' sont différents
-C:\Users\ulyss\Desktop\MEDUSA-Injector-medusa-patch-1\MEDUSA-Injector-medusa-patch-1\Medusa Injector\injection.c(11,34): warning C4024: 'LogError' : types différents pour le paramètre formel et réel 2
-  Medusa Injector.vcxproj -> C:\Users\ulyss\Desktop\MEDUSA-Injector-medusa-patch-1\MEDUSA-Injector-medusa-patch-1\x64\Debug\Medusa Injector.exe
